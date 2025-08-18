@@ -27,6 +27,7 @@ logs/
 # 环境变量文件
 .pytest_cache/
 
+.env
 .env.dev
 .env.test
 .env.prod
