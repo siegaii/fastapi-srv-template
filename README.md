@@ -22,7 +22,7 @@ poetry install --no-root
 ### 开发模式运行
 
 ```shell
-uvicorn main:app --reload --host 127.0.0.1 --port 8000
+python run.py
 ```
 
 ## 部署
