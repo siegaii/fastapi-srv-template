@@ -19,4 +19,10 @@ poetry source add --priority=primary mirrors https://pypi.tuna.tsinghua.edu.cn/s
 poetry install --no-root
 ```
 
+### 开发模式运行
+
+```shell
+poetry run dev
+```
+
 ## 部署
