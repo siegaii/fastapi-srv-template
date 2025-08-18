@@ -1,17 +1,25 @@
 [project]
 name = "fastapi-srv-template"
 version = "0.1.0"
-description = ""
+description = "FastAPI srv template"
 authors = [{ name = "siegaii" }]
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fastapi (>=0.116.1,<0.117.0)",
+    "uvicorn[standard] (>=0.35.0,<0.36.0)",
+]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+
+[[tool.poetry.source]]
+name = "mirrors"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+priority = "primary"
 
 [tool.pylint.messages_control]
 disable = [
