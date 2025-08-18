@@ -1,0 +1,26 @@
+# FastAPI核心依赖
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# 数据验证和序列化
+pydantic==2.5.0
+pydantic[email]==2.5.0
+
+# ASGI服务器
+uvicorn==0.24.0
+
+# 开发和测试依赖
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+
+# 代码格式化和检查
+black==23.11.0
+flake8==6.1.0
+isort==5.12.0
+
+# 类型检查
+mypy==1.7.1
+
+# 环境变量管理
+python-dotenv==1.0.0
