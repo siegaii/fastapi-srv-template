@@ -10,9 +10,6 @@ dependencies = [
     "uvicorn[standard] (>=0.35.0,<0.36.0)",
 ]
 
-[tool.poetry.scripts]
-dev = "uvicorn main:app --reload"
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
