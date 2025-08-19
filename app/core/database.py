@@ -6,9 +6,6 @@ from sqlalchemy import MetaData
 
 from app.core.config import settings
 
-from app.crud.user import user_crud
-from app.services.user_service import UserService
-
 
 class Base(DeclarativeBase):
     """数据库模型基类"""
@@ -64,6 +61,9 @@ async def close_db():
 
 async def create_default_superuser():
     """创建默认超级用户"""
+    # pylint: disable=import-outside-toplevel
+    from app.crud.user import user_crud
+    from app.services.user_service import UserService
 
     async with AsyncSessionLocal() as db:
         try:
