@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
+import os
 
 import hashlib
 from fastapi import APIRouter, HTTPException, Depends, status
@@ -11,9 +12,9 @@ import jwt
 router = APIRouter(prefix="/user", tags=["用户管理"])
 
 # JWT配置
-SECRET_KEY = "your-secret-key-here"  # 实际项目中应该从环境变量读取
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 # 安全认证
 security = HTTPBearer()
@@ -25,13 +26,6 @@ fake_users_db = {
         "username": "admin",
         "email": "admin@example.com",
         "hashed_password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",  # 'password' 的 SHA256
-        "is_active": True,
-    },
-    "user@example.com": {
-        "id": 2,
-        "username": "user",
-        "email": "user@example.com",
-        "hashed_password": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",  # 'secret123' 的 SHA256
         "is_active": True,
     },
 }
