@@ -16,14 +16,14 @@ user_service = UserService()
 
 # 依赖注入函数
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
-    """验证JWT令牌，返回email"""
+    """验证JWT令牌，返回username"""
     token = credentials.credentials
     return user_service.verify_token(token)
 
 
-def get_current_user(email: str = Depends(verify_token)):
+def get_current_user(username: str = Depends(verify_token)):
     """获取当前用户"""
-    return user_service.get_current_user(email)
+    return user_service.get_current_user(username)
 
 
 # API接口
@@ -32,14 +32,13 @@ async def login(login_request: LoginRequest):
     """
     用户登录接口
 
-    - **email**: 用户邮箱
+    - **username**: 用户名
     - **password**: 用户密码
 
     测试账号:
-    - admin@example.com / password
-    - user@example.com / secret123
+    - admin / password
     """
-    return user_service.login(login_request.email, login_request.password)
+    return user_service.login(login_request.username, login_request.password)
 
 
 @router.get("/profile", response_model=UserInfo, summary="获取用户信息")

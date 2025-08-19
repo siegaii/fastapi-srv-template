@@ -24,9 +24,9 @@ class UserService:
             os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
         )
 
-        # 模拟用户数据库
+        # 模拟用户数据库 - 改为以用户名为键
         self.fake_users_db = {
-            "admin@example.com": {
+            "admin": {
                 "id": 1,
                 "username": "admin",
                 "email": "admin@example.com",
@@ -57,21 +57,21 @@ class UserService:
         return encoded_jwt
 
     def verify_token(self, token: str) -> str:
-        """验证JWT令牌，返回email"""
+        """验证JWT令牌，返回用户标识(username)"""
         try:
             payload = jwt.decode(
                 token,
                 self.secret_key,
                 algorithms=[self.algorithm],
             )
-            email: str | None = payload.get("sub")
-            if not email:
+            username: str | None = payload.get("sub")
+            if not username:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="无效的认证凭据",
                     headers={"WWW-Authenticate": "Bearer"},
                 )
-            return email
+            return username
 
         except jwt.ExpiredSignatureError as exc:
             raise HTTPException(
@@ -87,22 +87,29 @@ class UserService:
                 headers={"WWW-Authenticate": "Bearer"},
             ) from exc
 
-    def authenticate_user(self, email: str, password: str) -> Optional[dict]:
+    def authenticate_user(self, username: str, password: str) -> Optional[dict]:
         """用户认证"""
-        user = self.fake_users_db.get(email)
+        user = self.fake_users_db.get(username)
         if not user:
             return None
         if not self.verify_password(password, user["hashed_password"]):
             return None
         return user
 
+    def get_user_by_username(self, username: str) -> Optional[dict]:
+        """根据用户名获取用户信息"""
+        return self.fake_users_db.get(username)
+
     def get_user_by_email(self, email: str) -> Optional[dict]:
         """根据邮箱获取用户信息"""
-        return self.fake_users_db.get(email)
+        for user in self.fake_users_db.values():
+            if user["email"] == email:
+                return user
+        return None
 
-    def get_current_user(self, email: str) -> dict:
+    def get_current_user(self, username: str) -> dict:
         """获取当前用户，如果用户不存在则抛出异常"""
-        user = self.get_user_by_email(email)
+        user = self.get_user_by_username(username)
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="用户不存在"
@@ -114,7 +121,7 @@ class UserService:
         # 创建访问令牌
         access_token_expires = timedelta(minutes=self.access_token_expire_minutes)
         access_token = self.create_access_token(
-            data={"sub": user["email"]}, expires_delta=access_token_expires
+            data={"sub": user["username"]}, expires_delta=access_token_expires
         )
 
         # 返回登录结果
@@ -138,14 +145,14 @@ class UserService:
             "is_active": user["is_active"],
         }
 
-    def login(self, email: str, password: str) -> dict:
+    def login(self, username: str, password: str) -> dict:
         """用户登录"""
         # 验证用户
-        user = self.authenticate_user(email, password)
+        user = self.authenticate_user(username, password)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="邮箱或密码错误",
+                detail="用户名或密码错误",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
