@@ -9,6 +9,7 @@ from app.core.config import settings
 
 class Base(DeclarativeBase):
     """数据库模型基类"""
+
     metadata = MetaData()
 
 

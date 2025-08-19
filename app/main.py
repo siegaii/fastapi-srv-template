@@ -9,15 +9,10 @@ from app.core.database import init_db, close_db
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
-    # 启动时初始化数据库
     await init_db()
-    print("数据库初始化完成")
-
     yield
-
     # 关闭时清理数据库连接
     await close_db()
-    print("数据库连接已关闭")
 
 
 app = FastAPI(
