@@ -36,7 +36,7 @@ class UserInfo(BaseModel):
 
 class UserCreate(BaseModel):
     """用户创建模型"""
-    
+
     username: str
     email: EmailStr
     password: str
@@ -47,7 +47,7 @@ class UserCreate(BaseModel):
 
 class UserUpdate(BaseModel):
     """用户更新模型"""
-    
+
     email: Optional[EmailStr] = None
     full_name: Optional[str] = None
     phone: Optional[str] = None
