@@ -153,3 +153,48 @@ class UserService:
 
         # 创建并返回登录响应
         return self.create_user_login_response(user)
+
+    async def register_user(
+        self, 
+        db: AsyncSession, 
+        username: str, 
+        email: str, 
+        password: str, 
+        full_name: str = None
+    ) -> dict:
+        """用户注册"""
+        # 检查用户名是否已存在
+        if await user_crud.check_username_exists(db, username):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="用户名已存在"
+            )
+        
+        # 检查邮箱是否已存在
+        if await user_crud.check_email_exists(db, email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="邮箱已存在"
+            )
+        
+        # 创建用户
+        hashed_password = self.hash_password(password)
+        user = await user_crud.create_user(
+            db=db,
+            username=username,
+            email=email,
+            hashed_password=hashed_password,
+            full_name=full_name,
+            is_active=True,
+            is_superuser=False
+        )
+        
+        # 返回用户信息（不包含密码）
+        return {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "is_active": user.is_active,
+            "created_at": user.created_at.isoformat() if user.created_at else None
+        }

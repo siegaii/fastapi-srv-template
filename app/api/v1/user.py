@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.schemas.user import LoginRequest, LoginResponse, UserInfo
+from app.schemas.user import LoginRequest, LoginResponse, UserInfo, UserRegisterRequest, UserRegisterResponse
 from app.services.user_service import UserService
 
 # 创建路由器
@@ -65,3 +65,24 @@ async def logout():
     注意：JWT是无状态的，实际项目中可能需要维护黑名单或使用短期令牌
     """
     return {"message": "登出成功"}
+
+
+@router.post("/register", response_model=UserRegisterResponse, summary="用户注册")
+async def register(register_request: UserRegisterRequest, db: AsyncSession = Depends(get_db)):
+    """
+    用户注册接口
+
+    - **username**: 用户名（必填，唯一）
+    - **email**: 邮箱（必填，唯一）
+    - **password**: 密码（必填）
+    - **full_name**: 全名（可选）
+    """
+    user_data = await user_service.register_user(
+        db=db,
+        username=register_request.username,
+        email=register_request.email,
+        password=register_request.password,
+        full_name=register_request.full_name
+    )
+    
+    return UserRegisterResponse(**user_data)

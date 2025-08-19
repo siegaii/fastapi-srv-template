@@ -54,3 +54,24 @@ class UserUpdate(BaseModel):
     avatar: Optional[str] = None
     bio: Optional[str] = None
     is_active: Optional[bool] = None
+
+
+class UserRegisterRequest(BaseModel):
+    """用户注册请求模型"""
+
+    username: str
+    email: EmailStr
+    password: str
+    full_name: Optional[str] = None
+
+
+class UserRegisterResponse(BaseModel):
+    """用户注册响应模型"""
+
+    id: int
+    username: str
+    email: str
+    full_name: Optional[str] = None
+    is_active: bool
+    created_at: Optional[str] = None
+    message: str = "用户注册成功"

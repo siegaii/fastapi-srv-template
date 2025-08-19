@@ -50,7 +50,45 @@ async def init_db():
         # 创建所有表
         await conn.run_sync(Base.metadata.create_all)
 
+    # 创建默认超级用户
+    await create_default_superuser()
+
 
 async def close_db():
     """关闭数据库连接"""
     await engine.dispose()
+
+
+async def create_default_superuser():
+    """创建默认超级用户"""
+    from app.crud.user import user_crud
+    from app.services.user_service import UserService
+
+    async with AsyncSessionLocal() as db:
+        try:
+            # 检查是否已存在超级用户
+            existing_admin = await user_crud.get_user_by_username(db, "admin")
+            if existing_admin:
+                print("超级用户已存在，跳过创建")
+                return
+
+            # 创建用户服务实例
+            user_service = UserService()
+
+            # 创建超级用户
+            hashed_password = user_service.hash_password("admin123")
+            admin_user = await user_crud.create_user(
+                db=db,
+                username="admin",
+                email="admin@example.com",
+                hashed_password=hashed_password,
+                full_name="系统管理员",
+                is_active=True,
+                is_superuser=True,
+            )
+            print(f"默认超级用户创建成功: {admin_user.username}")
+
+        except Exception as e:
+            print(f"创建默认超级用户失败: {e}")
+            await db.rollback()
+            raise
