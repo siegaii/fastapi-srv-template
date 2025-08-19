@@ -31,6 +31,3 @@ logs/
 .env.dev
 .env.test
 .env.prod
-
-.ai-docs
-.trae
