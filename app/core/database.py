@@ -65,7 +65,6 @@ async def close_db():
 async def create_default_superuser():
     """创建默认超级用户"""
 
-
     async with AsyncSessionLocal() as db:
         try:
             # 检查是否已存在超级用户
@@ -78,7 +77,7 @@ async def create_default_superuser():
 
             # 创建超级用户
             hashed_password = user_service.hash_password("admin123")
-            admin_user = await user_crud.create_user(
+            await user_crud.create_user(
                 db=db,
                 username="admin",
                 email="admin@example.com",
