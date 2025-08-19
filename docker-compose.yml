@@ -10,7 +10,6 @@ services:
       POSTGRES_DB: fastapi_db
       POSTGRES_USER: fastapi_user
       POSTGRES_PASSWORD: fastapi_password
-      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
     volumes:

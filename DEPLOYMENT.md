@@ -5,6 +5,7 @@
 ## 🎯 当前状态
 
 ✅ **已完成的工作：**
+
 - PostgreSQL 15 Docker 配置
 - 数据库连接和配置管理
 - 用户数据模型设计
@@ -17,6 +18,7 @@
 ### 1. 安装 Docker Desktop
 
 **macOS:**
+
 ```bash
 # 方法1: 直接下载安装
 # 访问 https://www.docker.com/products/docker-desktop
@@ -27,6 +29,7 @@ brew install --cask docker
 ```
 
 **验证安装：**
+
 ```bash
 docker --version
 docker compose version
@@ -67,10 +70,12 @@ python run.py
 ### 5. 测试 API 功能
 
 **访问 API 文档：**
+
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
 **测试用户登录：**
+
 ```bash
 # 使用 curl 测试（需要先创建用户）
 curl -X POST "http://localhost:8000/api/v1/user/login" \
@@ -106,6 +111,7 @@ DB_POOL_TIMEOUT=30
 ### Docker Compose 配置
 
 数据库服务配置在 `docker-compose.yml` 中：
+
 - **镜像**: PostgreSQL 15 Alpine
 - **端口**: 5432
 - **数据库**: fastapi_db
@@ -141,12 +147,12 @@ SELECT * FROM users;  -- 查看用户数据
 
 ```sql
 -- 插入测试用户（密码已哈希）
-INSERT INTO users (username, email, hashed_password, is_active, full_name) 
+INSERT INTO users (username, email, hashed_password, is_active, full_name)
 VALUES (
-    'admin', 
-    'admin@example.com', 
+    'admin',
+    'admin@example.com',
     '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW',  -- 密码: password
-    true, 
+    true,
     'Administrator'
 );
 ```
@@ -156,12 +162,14 @@ VALUES (
 ### 安全配置
 
 1. **更改默认密码**：
+
    ```env
    SECRET_KEY=your-super-secret-key-here
    POSTGRES_PASSWORD=your-secure-database-password
    ```
 
 2. **使用环境变量**：
+
    - 不要在代码中硬编码敏感信息
    - 使用 `.env` 文件管理配置
 
@@ -173,6 +181,7 @@ VALUES (
 ### 性能优化
 
 1. **连接池配置**：
+
    ```env
    DB_POOL_SIZE=20
    DB_MAX_OVERFLOW=40
@@ -188,12 +197,14 @@ VALUES (
 ### 常见问题
 
 1. **Docker 未启动**：
+
    ```bash
    # 启动 Docker Desktop
    open -a Docker
    ```
 
 2. **端口冲突**：
+
    ```bash
    # 检查端口占用
    lsof -i :5432
@@ -201,6 +212,7 @@ VALUES (
    ```
 
 3. **数据库连接失败**：
+
    ```bash
    # 检查容器状态
    docker compose ps
