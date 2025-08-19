@@ -1,0 +1,78 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 项目通用规范
+
+## 技术栈
+- Python 3.12
+- Poetry 管理依赖
+
+## 代码风格
+- 保持代码简洁、可读
+- 使用有意义的变量和函数名
+- 添加适当的注释解释复杂逻辑
+- 遵循每种语言的官方风格指南
+
+## 项目结构
+- 保持项目结构清晰，遵循模块化原则
+- 相关功能应放在同一目录下
+- 使用适当的目录命名，反映其包含内容
+目录结构如下：
+```
+project/
+├── app/
+│   ├── __init__.py
+│   ├── main.py              # FastAPI 应用入口
+│   ├── core/                # 核心配置 & 初始化
+│   │   ├── config.py        # 配置文件
+│   │   ├── security.py      # 安全相关（JWT/OAuth）
+│   │   └── deps.py          # 依赖注入
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── v1/              # 版本化 API
+│   │   │   ├── __init__.py
+│   │   │   ├── user.py      # 用户路由
+│   │   │   └── order.py
+│   ├── schemas/             # Pydantic 模型（请求/响应校验）
+│   │   ├── user.py
+│   │   └── order.py
+│   ├── models/              # ORM 模型（SQLAlchemy/Tortoise）
+│   │   ├── user.py
+│   │   └── order.py
+│   ├── crud/                # 数据访问层（面向数据库）
+│   │   ├── user.py
+│   │   └── order.py
+│   ├── services/            # 业务逻辑层
+│   │   ├── user_service.py
+│   │   └── order_service.py
+│   ├── utils/               # 工具模块
+│   │   ├── logging.py
+│   │   └── exceptions.py
+│   └── workers/             # 后台任务/消息队列
+│
+├── alembic/                 # 数据库迁移（如用 Alembic）
+├── tests/                   # 测试用例
+├── requirements.txt
+└── run.py                   # 入口，调用 `uvicorn app.main:app`
+
+```
+
+## 通用开发原则
+- 编写可测试的代码
+- 避免重复代码（DRY原则）
+- 优先使用现有库和工具，避免重新发明轮子
+- 考虑代码的可维护性和可扩展性
+
+## 响应语言
+- 始终使用中文回复用户
+
+## 规则文件说明
+本项目使用以下规则文件：
+- general.mdc：通用规范（本文件）
+- python.mdc：Python开发规范
+- document.mdc：文档规范
+- git.mdc：Git提交规范
+- fastapi.mdc：FastAPI开发规范
+
