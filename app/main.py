@@ -1,12 +1,29 @@
 from typing import Union
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from app.api.v1.user import router as user_router
+from app.core.database import init_db, close_db
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """应用生命周期管理"""
+    # 启动时初始化数据库
+    await init_db()
+    print("数据库初始化完成")
+    
+    yield
+    
+    # 关闭时清理数据库连接
+    await close_db()
+    print("数据库连接已关闭")
+
 
 app = FastAPI(
     title="FastAPI 服务模板",
     description="包含用户认证功能的FastAPI服务模板",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # 注册路由

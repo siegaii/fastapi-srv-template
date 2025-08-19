@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.database import get_db
 from app.schemas.user import LoginRequest, LoginResponse, UserInfo
-from app.services import UserService
+from app.services.user_service import UserService
 
 # 创建路由器
 router = APIRouter(prefix="/user", tags=["用户管理"])
@@ -21,14 +23,17 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
     return user_service.verify_token(token)
 
 
-def get_current_user(username: str = Depends(verify_token)):
+async def get_current_user(
+    username: str = Depends(verify_token),
+    db: AsyncSession = Depends(get_db)
+):
     """获取当前用户"""
-    return user_service.get_current_user(username)
+    return await user_service.get_current_user(db, username)
 
 
 # API接口
 @router.post("/login", response_model=LoginResponse, summary="用户登录")
-async def login(login_request: LoginRequest):
+async def login(login_request: LoginRequest, db: AsyncSession = Depends(get_db)):
     """
     用户登录接口
 
@@ -38,11 +43,11 @@ async def login(login_request: LoginRequest):
     测试账号:
     - admin / password
     """
-    return user_service.login(login_request.username, login_request.password)
+    return await user_service.login(db, login_request.username, login_request.password)
 
 
 @router.get("/profile", response_model=UserInfo, summary="获取用户信息")
-async def get_user_profile(current_user: dict = Depends(get_current_user)):
+async def get_user_profile(current_user = Depends(get_current_user)):
     """
     获取当前登录用户的信息
 

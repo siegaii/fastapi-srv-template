@@ -1,16 +1,19 @@
-"""
-用户服务模块
+"""用户服务模块
 
 处理用户管理相关的业务逻辑，包括用户认证、用户信息获取等
 """
 
 import hashlib
-import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import jwt
 from fastapi import HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.config import settings
+from app.crud.user import user_crud
+from app.models.user import User
 
 
 class UserService:
@@ -18,22 +21,9 @@ class UserService:
 
     def __init__(self):
         # JWT配置
-        self.secret_key = os.getenv("SECRET_KEY", "your-secret-key-here")
-        self.algorithm = os.getenv("ALGORITHM", "HS256")
-        self.access_token_expire_minutes = int(
-            os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
-        )
-
-        # 模拟用户数据库 - 改为以用户名为键
-        self.fake_users_db = {
-            "admin": {
-                "id": 1,
-                "username": "admin",
-                "email": "admin@example.com",
-                "hashed_password": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",  # 'password' 的 SHA256
-                "is_active": True,
-            },
-        }
+        self.secret_key = settings.secret_key
+        self.algorithm = settings.algorithm
+        self.access_token_expire_minutes = settings.access_token_expire_minutes
 
     def hash_password(self, password: str) -> str:
         """密码哈希"""
@@ -87,68 +77,73 @@ class UserService:
                 headers={"WWW-Authenticate": "Bearer"},
             ) from exc
 
-    def authenticate_user(self, username: str, password: str) -> Optional[dict]:
-        """用户认证"""
-        user = self.fake_users_db.get(username)
-        if not user:
+    async def authenticate_user(self, db: AsyncSession, username: str, password: str) -> Optional[User]:
+        """验证用户身份"""
+        user = await user_crud.get_user_by_username(db, username)
+        if not user or not user.is_active or not self.verify_password(password, user.hashed_password):
             return None
-        if not self.verify_password(password, user["hashed_password"]):
-            return None
+        
+        # 更新最后登录时间
+        await user_crud.update_last_login(db, user.id)
         return user
 
-    def get_user_by_username(self, username: str) -> Optional[dict]:
-        """根据用户名获取用户信息"""
-        return self.fake_users_db.get(username)
+    async def get_user_by_username(self, db: AsyncSession, username: str) -> Optional[User]:
+        """根据用户名获取用户"""
+        return await user_crud.get_user_by_username(db, username)
 
-    def get_user_by_email(self, email: str) -> Optional[dict]:
-        """根据邮箱获取用户信息"""
-        for user in self.fake_users_db.values():
-            if user["email"] == email:
-                return user
-        return None
+    async def get_user_by_email(self, db: AsyncSession, email: str) -> Optional[User]:
+        """根据邮箱获取用户"""
+        return await user_crud.get_user_by_email(db, email)
 
-    def get_current_user(self, username: str) -> dict:
+    async def get_current_user(self, db: AsyncSession, username: str) -> User:
         """获取当前用户，如果用户不存在则抛出异常"""
-        user = self.get_user_by_username(username)
-        if user is None:
+        user = await self.get_user_by_username(db, username)
+        if user is None or not user.is_active:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="用户不存在"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="用户不存在或已被禁用"
             )
         return user
 
-    def create_user_login_response(self, user: dict) -> dict:
-        """创建用户登录响应数据"""
+    def create_user_login_response(self, user: User) -> dict:
+        """创建用户登录响应"""
         # 创建访问令牌
         access_token_expires = timedelta(minutes=self.access_token_expire_minutes)
         access_token = self.create_access_token(
-            data={"sub": user["username"]}, expires_delta=access_token_expires
+            data={"sub": user.username}, expires_delta=access_token_expires
         )
 
-        # 返回登录结果
+        # 返回登录响应
         return {
             "access_token": access_token,
             "token_type": "bearer",
             "user_info": {
-                "id": user["id"],
-                "username": user["username"],
-                "email": user["email"],
-                "is_active": user["is_active"],
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "is_active": user.is_active,
+                "full_name": user.full_name,
             },
         }
 
-    def get_user_profile(self, user: dict) -> dict:
-        """获取用户资料信息"""
+    def get_user_profile(self, user: User) -> dict:
+        """获取用户资料"""
         return {
-            "id": user["id"],
-            "username": user["username"],
-            "email": user["email"],
-            "is_active": user["is_active"],
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "is_active": user.is_active,
+            "full_name": user.full_name,
+            "phone": user.phone,
+            "avatar": user.avatar,
+            "bio": user.bio,
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+            "last_login_at": user.last_login_at.isoformat() if user.last_login_at else None,
         }
 
-    def login(self, username: str, password: str) -> dict:
+    async def login(self, db: AsyncSession, username: str, password: str) -> dict:
         """用户登录"""
-        # 验证用户
-        user = self.authenticate_user(username, password)
+        # 验证用户身份
+        user = await self.authenticate_user(db, username, password)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 
 
@@ -23,3 +26,31 @@ class UserInfo(BaseModel):
     username: str
     email: str
     is_active: bool
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    avatar: Optional[str] = None
+    bio: Optional[str] = None
+    created_at: Optional[str] = None
+    last_login_at: Optional[str] = None
+
+
+class UserCreate(BaseModel):
+    """用户创建模型"""
+    
+    username: str
+    email: EmailStr
+    password: str
+    full_name: Optional[str] = None
+    is_active: bool = True
+    is_superuser: bool = False
+
+
+class UserUpdate(BaseModel):
+    """用户更新模型"""
+    
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    avatar: Optional[str] = None
+    bio: Optional[str] = None
+    is_active: Optional[bool] = None

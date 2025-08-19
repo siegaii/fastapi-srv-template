@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库服务
+  postgres:
+    image: postgres:15-alpine
+    container_name: fastapi_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fastapi_db
+      POSTGRES_USER: fastapi_user
+      POSTGRES_PASSWORD: fastapi_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - fastapi_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fastapi_user -d fastapi_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI 应用服务（可选，用于完整的容器化部署）
+  # app:
+  #   build: .
+  #   container_name: fastapi_app
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - DATABASE_URL=postgresql://fastapi_user:fastapi_password@postgres:5432/fastapi_db
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - fastapi_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  fastapi_network:
+    driver: bridge
