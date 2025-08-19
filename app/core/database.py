@@ -6,6 +6,9 @@ from sqlalchemy import MetaData
 
 from app.core.config import settings
 
+from app.crud.user import user_crud
+from app.services.user_service import UserService
+
 
 class Base(DeclarativeBase):
     """数据库模型基类"""
@@ -61,15 +64,13 @@ async def close_db():
 
 async def create_default_superuser():
     """创建默认超级用户"""
-    from app.crud.user import user_crud
-    from app.services.user_service import UserService
+
 
     async with AsyncSessionLocal() as db:
         try:
             # 检查是否已存在超级用户
             existing_admin = await user_crud.get_user_by_username(db, "admin")
             if existing_admin:
-                print("超级用户已存在，跳过创建")
                 return
 
             # 创建用户服务实例
@@ -86,7 +87,6 @@ async def create_default_superuser():
                 is_active=True,
                 is_superuser=True,
             )
-            print(f"默认超级用户创建成功: {admin_user.username}")
 
         except Exception as e:
             print(f"创建默认超级用户失败: {e}")
