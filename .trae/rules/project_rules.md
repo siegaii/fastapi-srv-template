@@ -8,6 +8,7 @@ alwaysApply: true
 ## 技术栈
 - Python 3.12
 - Poetry 管理依赖
+- 数据库：PostgreSQL，不要给我乱用其他的数据库
 
 ## 代码风格
 - 保持代码简洁、可读
