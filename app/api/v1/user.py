@@ -3,7 +3,13 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.schemas.user import LoginRequest, LoginResponse, UserInfo, UserRegisterRequest, UserRegisterResponse
+from app.schemas.user import (
+    LoginRequest,
+    LoginResponse,
+    UserInfo,
+    UserRegisterRequest,
+    UserRegisterResponse,
+)
 from app.services.user_service import UserService
 
 # 创建路由器
@@ -24,8 +30,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
 
 
 async def get_current_user(
-    username: str = Depends(verify_token),
-    db: AsyncSession = Depends(get_db)
+    username: str = Depends(verify_token), db: AsyncSession = Depends(get_db)
 ):
     """获取当前用户"""
     return await user_service.get_current_user(db, username)
@@ -47,7 +52,7 @@ async def login(login_request: LoginRequest, db: AsyncSession = Depends(get_db))
 
 
 @router.get("/profile", response_model=UserInfo, summary="获取用户信息")
-async def get_user_profile(current_user = Depends(get_current_user)):
+async def get_user_profile(current_user=Depends(get_current_user)):
     """
     获取当前登录用户的信息
 
@@ -68,7 +73,9 @@ async def logout():
 
 
 @router.post("/register", response_model=UserRegisterResponse, summary="用户注册")
-async def register(register_request: UserRegisterRequest, db: AsyncSession = Depends(get_db)):
+async def register(
+    register_request: UserRegisterRequest, db: AsyncSession = Depends(get_db)
+):
     """
     用户注册接口
 
@@ -82,7 +89,7 @@ async def register(register_request: UserRegisterRequest, db: AsyncSession = Dep
         username=register_request.username,
         email=register_request.email,
         password=register_request.password,
-        full_name=register_request.full_name
+        full_name=register_request.full_name,
     )
-    
+
     return UserRegisterResponse(**user_data)
