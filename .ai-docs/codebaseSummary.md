@@ -23,20 +23,41 @@ fastapi-srv-template/
 │   ├── currentTask.md      # 当前任务
 │   └── tasks/              # 任务中心目录
 ├── README.md               # 项目说明文档
+├── DEPLOYMENT.md           # 部署说明文档
 ├── pyproject.toml          # Poetry 项目配置文件
 ├── poetry.lock             # Poetry 依赖锁定文件
 ├── run.py                  # 应用启动入口
+├── docker-compose.yml      # Docker Compose 配置
+├── init.sql                # 数据库初始化脚本
+├── alembic.ini             # Alembic 数据库迁移配置
+├── alembic/                # 数据库迁移目录
+│   ├── env.py              # Alembic 环境配置
+│   ├── script.py.mako      # 迁移脚本模板
+│   └── versions/           # 迁移版本文件
+│       └── 19dfe76188cb_initial_migration.py
 └── app/                    # 主应用目录
     ├── __init__.py         # 包初始化文件
     ├── main.py             # FastAPI 应用主文件
+    ├── core/               # 核心配置模块
+    │   ├── config.py       # 应用配置
+    │   └── database.py     # 数据库配置
     ├── api/                # API 路由目录
     │   ├── __init__.py     # API 包初始化
     │   └── v1/             # API v1 版本
     │       ├── __init__.py # v1 包初始化
     │       └── user.py     # 用户相关路由
-    └── schemas/            # Pydantic 数据模型
-        ├── __init__.py     # Schemas 包初始化
-        └── user.py         # 用户数据模型
+    ├── schemas/            # Pydantic 数据模型
+    │   ├── __init__.py     # Schemas 包初始化
+    │   └── user.py         # 用户数据模型
+    ├── models/             # ORM 数据模型
+    │   └── user.py         # 用户数据模型
+    ├── crud/               # 数据访问层
+    │   └── user.py         # 用户 CRUD 操作
+    ├── services/           # 业务逻辑层
+    │   ├── __init__.py     # Services 包初始化
+    │   └── user_service.py # 用户业务逻辑
+    └── utils/              # 工具模块
+        └── snowflake.py    # 雪花算法 ID 生成
 ```
 
 ## 核心模块详解

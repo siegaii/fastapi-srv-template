@@ -41,7 +41,29 @@
   - 符合 RFC 标准的邮箱验证
   - 与 Pydantic 集成
 
+### 数据库和 ORM
+- **SQLAlchemy (>=2.0.0)**: Python SQL 工具包和 ORM
+  - 异步支持 (AsyncSession)
+  - 声明式模型定义
+  - 查询构建器和原生 SQL 支持
+  - 连接池管理
+
+- **AsyncPG (>=0.29.0)**: PostgreSQL 异步驱动
+  - 高性能异步 PostgreSQL 连接
+  - 与 SQLAlchemy 完美集成
+  - 支持连接池和事务
+
+- **Alembic (>=1.13.0)**: 数据库迁移工具
+  - 版本化数据库 schema 管理
+  - 自动迁移脚本生成
+  - 支持多环境配置
+
 ### 配置管理
+- **Pydantic Settings (>=2.0.0)**: 现代配置管理
+  - 基于 Pydantic 的设置验证
+  - 环境变量自动映射
+  - 类型安全的配置
+
 - **python-dotenv (load-dotenv)**: 环境变量管理
   - `.env` 文件支持
   - 开发/生产环境配置分离
