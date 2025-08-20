@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Boolean, DateTime, Integer, String, Text
+from sqlalchemy import BigInteger, Boolean, DateTime, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -17,7 +17,7 @@ class User(Base):
 
     # 主键
     id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, index=True, autoincrement=True
+        BigInteger, primary_key=True, index=True
     )
 
     # 基本信息
@@ -54,14 +54,14 @@ class User(Base):
     # 时间戳
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),
+        server_default=func.now(),  # type: ignore
         nullable=False,
         comment="创建时间",
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
+        server_default=func.now(),  # type: ignore
+        onupdate=func.now(),  # type: ignore
         nullable=False,
         comment="更新时间",
     )

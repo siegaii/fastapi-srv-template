@@ -7,6 +7,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
+from app.utils.snowflake import snowflake_generator
 
 
 class UserCRUD:
@@ -24,6 +25,7 @@ class UserCRUD:
     ) -> User:
         """创建用户"""
         db_user = User(
+            id=snowflake_generator.generate(),
             username=username,
             email=email,
             hashed_password=hashed_password,
