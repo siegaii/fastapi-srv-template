@@ -14,7 +14,7 @@ from app.schemas.base import (
     BaseResponse,
     success_response,
     created_response,
-    error_response,
+    # error_response,
 )
 from app.services.user_service import UserService
 
