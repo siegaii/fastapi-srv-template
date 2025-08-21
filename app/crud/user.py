@@ -17,7 +17,6 @@ class UserCRUD:
         self,
         db: AsyncSession,
         username: str,
-        email: str,
         hashed_password: str,
         full_name: Optional[str] = None,
         is_active: bool = True,
@@ -27,7 +26,6 @@ class UserCRUD:
         db_user = User(
             id=snowflake_generator.generate(),
             username=username,
-            email=email,
             hashed_password=hashed_password,
             full_name=full_name,
             is_active=is_active,

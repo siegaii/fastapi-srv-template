@@ -77,17 +77,25 @@ class UserService:
                 headers={"WWW-Authenticate": "Bearer"},
             ) from exc
 
-    async def authenticate_user(self, db: AsyncSession, username: str, password: str) -> Optional[User]:
+    async def authenticate_user(
+        self, db: AsyncSession, username: str, password: str
+    ) -> Optional[User]:
         """验证用户身份"""
         user = await user_crud.get_user_by_username(db, username)
-        if not user or not user.is_active or not self.verify_password(password, user.hashed_password):
+        if (
+            not user
+            or not user.is_active
+            or not self.verify_password(password, user.hashed_password)
+        ):
             return None
-        
+
         # 更新最后登录时间
         await user_crud.update_last_login(db, user.id)
         return user
 
-    async def get_user_by_username(self, db: AsyncSession, username: str) -> Optional[User]:
+    async def get_user_by_username(
+        self, db: AsyncSession, username: str
+    ) -> Optional[User]:
         """根据用户名获取用户"""
         return await user_crud.get_user_by_username(db, username)
 
@@ -137,7 +145,9 @@ class UserService:
             "avatar": user.avatar,
             "bio": user.bio,
             "created_at": user.created_at.isoformat() if user.created_at else None,
-            "last_login_at": user.last_login_at.isoformat() if user.last_login_at else None,
+            "last_login_at": (
+                user.last_login_at.isoformat() if user.last_login_at else None
+            ),
         }
 
     async def login(self, db: AsyncSession, username: str, password: str) -> dict:
@@ -155,40 +165,30 @@ class UserService:
         return self.create_user_login_response(user)
 
     async def register_user(
-        self, 
-        db: AsyncSession, 
-        username: str, 
-        email: str, 
-        password: str, 
-        full_name: str = None
+        self,
+        db: AsyncSession,
+        username: str,
+        password: str,
+        full_name: str = None,
     ) -> dict:
         """用户注册"""
         # 检查用户名是否已存在
         if await user_crud.check_username_exists(db, username):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="用户名已存在"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已存在"
             )
-        
-        # 检查邮箱是否已存在
-        if await user_crud.check_email_exists(db, email):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="邮箱已存在"
-            )
-        
+
         # 创建用户
         hashed_password = self.hash_password(password)
         user = await user_crud.create_user(
             db=db,
             username=username,
-            email=email,
             hashed_password=hashed_password,
             full_name=full_name,
             is_active=True,
-            is_superuser=False
+            is_superuser=False,
         )
-        
+
         # 返回用户信息（不包含密码）
         return {
             "id": user.id,
@@ -196,5 +196,5 @@ class UserService:
             "email": user.email,
             "full_name": user.full_name,
             "is_active": user.is_active,
-            "created_at": user.created_at.isoformat() if user.created_at else None
+            "created_at": user.created_at.isoformat() if user.created_at else None,
         }

@@ -3,9 +3,8 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import BigInteger, Boolean, DateTime, String, Text
+from sqlalchemy import BigInteger, Boolean, DateTime, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.sql import func
 
 from app.core.database import Base
 
@@ -25,7 +24,7 @@ class User(Base):
         String(50), unique=True, index=True, nullable=False, comment="用户名"
     )
     email: Mapped[str] = mapped_column(
-        String(100), unique=True, index=True, nullable=False, comment="邮箱"
+        String(100), unique=True, index=True, nullable=True, comment="邮箱"
     )
     hashed_password: Mapped[str] = mapped_column(
         String(255), nullable=False, comment="加密密码"
@@ -54,14 +53,14 @@ class User(Base):
     # 时间戳
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),  # type: ignore
+        server_default=text("CURRENT_TIMESTAMP"),
         nullable=False,
         comment="创建时间",
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),  # type: ignore
-        onupdate=func.now(),  # type: ignore
+        server_default=text("CURRENT_TIMESTAMP"),
+        onupdate=text("CURRENT_TIMESTAMP"),
         nullable=False,
         comment="更新时间",
     )

@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr
@@ -60,7 +59,7 @@ class UserRegisterRequest(BaseModel):
     """用户注册请求模型"""
 
     username: str
-    email: EmailStr
+    email: Optional[EmailStr] = None
     password: str
     full_name: Optional[str] = None
 

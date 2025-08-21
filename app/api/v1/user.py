@@ -80,14 +80,13 @@ async def register(
     用户注册接口
 
     - **username**: 用户名（必填，唯一）
-    - **email**: 邮箱（必填，唯一）
+    - **email**: 邮箱（可选）
     - **password**: 密码（必填）
     - **full_name**: 全名（可选）
     """
     user_data = await user_service.register_user(
         db=db,
         username=register_request.username,
-        email=register_request.email,
         password=register_request.password,
         full_name=register_request.full_name,
     )
