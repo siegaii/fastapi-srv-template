@@ -10,6 +10,12 @@ from app.schemas.user import (
     UserRegisterRequest,
     UserRegisterResponse,
 )
+from app.schemas.base import (
+    BaseResponse,
+    success_response,
+    created_response,
+    error_response,
+)
 from app.services.user_service import UserService
 
 # 创建路由器
@@ -37,7 +43,7 @@ async def get_current_user(
 
 
 # API接口
-@router.post("/login", response_model=LoginResponse, summary="用户登录")
+@router.post("/login", response_model=BaseResponse[LoginResponse], summary="用户登录")
 async def login(login_request: LoginRequest, db: AsyncSession = Depends(get_db)):
     """
     用户登录接口
@@ -48,10 +54,13 @@ async def login(login_request: LoginRequest, db: AsyncSession = Depends(get_db))
     测试账号:
     - admin / password
     """
-    return await user_service.login(db, login_request.username, login_request.password)
+    login_data = await user_service.login(
+        db, login_request.username, login_request.password
+    )
+    return success_response(data=login_data, msg="登录成功")
 
 
-@router.get("/profile", response_model=UserInfo, summary="获取用户信息")
+@router.get("/profile", response_model=BaseResponse[UserInfo], summary="获取用户信息")
 async def get_user_profile(current_user=Depends(get_current_user)):
     """
     获取当前登录用户的信息
@@ -59,20 +68,22 @@ async def get_user_profile(current_user=Depends(get_current_user)):
     需要在请求头中携带 Authorization: Bearer <token>
     """
     profile = user_service.get_user_profile(current_user)
-    return UserInfo(**profile)
+    return success_response(data=UserInfo(**profile), msg="获取用户信息成功")
 
 
-@router.post("/logout", summary="用户登出")
+@router.post("/logout", response_model=BaseResponse[None], summary="用户登出")
 async def logout():
     """
     用户登出接口
 
     注意：JWT是无状态的，实际项目中可能需要维护黑名单或使用短期令牌
     """
-    return {"message": "登出成功"}
+    return success_response(msg="登出成功")
 
 
-@router.post("/register", response_model=UserRegisterResponse, summary="用户注册")
+@router.post(
+    "/register", response_model=BaseResponse[UserRegisterResponse], summary="用户注册"
+)
 async def register(
     register_request: UserRegisterRequest, db: AsyncSession = Depends(get_db)
 ):
@@ -91,4 +102,4 @@ async def register(
         full_name=register_request.full_name,
     )
 
-    return UserRegisterResponse(**user_data)
+    return created_response(data=UserRegisterResponse(**user_data), msg="用户注册成功")
