@@ -55,7 +55,8 @@ project/
 │
 ├── alembic/                 # 数据库迁移（如用 Alembic）
 ├── tests/                   # 测试用例
-├── requirements.txt
+├── pyproject.toml           # Poetry 项目配置和依赖管理
+├── poetry.lock              # Poetry 锁定文件
 └── run.py                   # 入口，调用 `uvicorn app.main:app`
 
 ```

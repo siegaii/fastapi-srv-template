@@ -44,7 +44,9 @@ poetry install
 poetry shell
 ```
 
-#### 使用 pip
+#### 使用 pip（不推荐）
+
+如果您不想使用 Poetry，也可以使用传统的 pip 方式：
 
 ```bash
 # 创建虚拟环境
@@ -52,8 +54,8 @@ python -m venv venv
 source venv/bin/activate  # Linux/macOS
 # 或 venv\Scripts\activate  # Windows
 
-# 安装依赖
-pip install -r requirements.txt
+# 从 pyproject.toml 安装依赖
+pip install -e .
 ```
 
 ### 3. 环境变量配置
@@ -275,8 +277,9 @@ pytest --cov=app
 
 1. **安装依赖**：
 
+   使用 Poetry（推荐）：
    ```bash
-   pip install -r requirements.txt
+   poetry install --only=main
    ```
 
 2. **配置环境变量**：
